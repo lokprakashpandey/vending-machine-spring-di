@@ -7,7 +7,15 @@
 
 package com.lokpandey.vendingmachine.dao;
 
+import com.lokpandey.vendingmachine.dto.Item;
+import java.util.List;
+import java.util.Map;
+
 
 public interface VendingMachineDao {
+    
+    Map<Item, Integer> selectInventory() throws InventoryPersistenceException;
+    
+    List<Item> selectNonZeroInventory() throws InventoryPersistenceException;
 
 }
