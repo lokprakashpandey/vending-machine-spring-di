@@ -59,11 +59,11 @@ public class VendingMachineController {
         }
         
         
-        int totalMenuOptions = inventoryList.size()+1;
+        int totalMenuOptions = inventoryList.size()+1;//because Exit is also another option
         int menuChoice = view.getMenuChoiceSelection(totalMenuOptions);
-        if(menuChoice == totalMenuOptions) {
+        if(menuChoice == totalMenuOptions) { //if Exit is selected
             exitMessage();
-            return false;
+            return false; // false is returned and loop in run() gets terminated
         }
         else {
             
@@ -73,7 +73,7 @@ public class VendingMachineController {
                 service.isNoItemInInventory(itemSelected, inventoryMap);
             } catch (NoItemInventoryException ex) {
                 view.displayErrorMessage(ex.getMessage());
-                return true;
+                return true; //true is returned and loop in run() is continued
             }
             
             try {
