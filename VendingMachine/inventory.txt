@@ -1,6 +1,6 @@
-Doritos::1.49::5
-Nestle Chocolate Milk::3.99::1
+Dairy Milk::0.99::15
+Doritos::1.49::4
+Nestle Chocolate Milk::3.99::2
 Coke::1.99::10
-Dairy Milk::0.99::16
 Lays::1.59::7
 Lollipop::1.99::0
