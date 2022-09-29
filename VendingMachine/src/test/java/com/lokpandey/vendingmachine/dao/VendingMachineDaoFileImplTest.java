@@ -64,8 +64,10 @@ public class VendingMachineDaoFileImplTest {
     }
     
     public static boolean compareMapsResult(Map<Item, Integer> mapFromFile, Map<Item, Integer> mapToCompare) {
-        int resultCount = 0;
         
+        int resultCount = 0;
+        //The resultCount will be 2 when the 2 items from both maps match
+    
         for(Map.Entry<Item, Integer> entryFromFile: mapFromFile.entrySet()) {
             Item itemFromFile = entryFromFile.getKey();
             int quantityFromFile = entryFromFile.getValue();

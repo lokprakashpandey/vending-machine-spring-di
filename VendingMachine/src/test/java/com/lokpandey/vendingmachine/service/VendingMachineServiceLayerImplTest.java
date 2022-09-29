@@ -79,6 +79,7 @@ public class VendingMachineServiceLayerImplTest {
             
         try {
             service.isNoItemInInventory(item, inventory);
+            //If it does not throw an exception, then the test is a fail
             fail("Expected to throw NoItemInventoryException");
         } catch(NoItemInventoryException niie) {
             
@@ -90,10 +91,14 @@ public class VendingMachineServiceLayerImplTest {
         Item item = new Item("Toffee", new BigDecimal("0.99"));
         int quantity = 15;
         
+        //after updation the quantity should be quantity - 1, 
+        //the inventory should be updated and the audit entry should be written
+        //then only auditWritten would be true
         boolean auditWritten = service.updateInventory(item);
         
         Map<Item, Integer> inventory = service.serveAllInventory();
         boolean updated = false;
+        //one entry is updated, so check it and set updated if the entry is in the inventory 
         for(Map.Entry<Item, Integer> entry: inventory.entrySet()) {
             if(entry.getKey().getName().equalsIgnoreCase(item.getName()) 
                     && entry.getKey().getCost().compareTo(new BigDecimal("0.99")) == 0
