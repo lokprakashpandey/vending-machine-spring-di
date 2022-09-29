@@ -53,7 +53,7 @@ public class VendingMachineView {
     }
     
     public void displayBuyingMessage(Item item) {
-        io.print("You are buying " + item.getName() + " for " + item.getCost());
+        io.print("You are buying " + item.getName() + " for $" + item.getCost());
     }
 
     public void displayChange(Change change) {
