@@ -8,11 +8,17 @@
 package com.lokpandey.vendingmachine.dto;
 
 
-public class Change {
+public final class Change {
+
+    private int numberOfQuarters;
+
+    private int numberOfDimes;
     
-    public static int[] calculate(int amountInPennies) {
-        int numberOfQuarters = 0, numberOfDimes = 0, numberOfNickels = 0, numberOfPennies = 0;
-        
+    private int numberOfNickels;
+    
+    private final int numberOfPennies;
+    
+    public Change(int amountInPennies) {
         while(amountInPennies >= Coin.QUARTER.getValue()) {
             ++numberOfQuarters;
             amountInPennies -= Coin.QUARTER.getValue();
@@ -30,7 +36,22 @@ public class Change {
         
         numberOfPennies = amountInPennies;
         
-        return new int[]{numberOfQuarters,numberOfDimes, numberOfNickels, numberOfNickels};
+    }
+
+    public int getNumberOfQuarters() {
+        return numberOfQuarters;
+    }
+
+    public int getNumberOfDimes() {
+        return numberOfDimes;
+    }
+
+    public int getNumberOfNickels() {
+        return numberOfNickels;
+    }
+
+    public int getNumberOfPennies() {
+        return numberOfPennies;
     }
 
 }

@@ -9,7 +9,6 @@ package com.lokpandey.vendingmachine.service;
 import com.lokpandey.vendingmachine.dao.InventoryPersistenceException;
 import com.lokpandey.vendingmachine.dto.Item;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,10 +17,15 @@ import java.util.Map;
  */
 public interface VendingMachineServiceLayer {
     
-    Map<Item, Integer> serveInventory() throws InventoryPersistenceException;
+    Map<Item, Integer> serveAllInventory() throws InventoryPersistenceException;
     
-    List<Item> serveNonZeroInventory() throws InventoryPersistenceException;
+    //List<Item> serveNonZeroInventory() throws InventoryPersistenceException;
     
-    boolean checkCapacityToBuy(BigDecimal money, BigDecimal cost) throws InsufficientFundsException;
+    boolean isCapableToBuy(BigDecimal money, BigDecimal cost) throws InsufficientFundsException;
+    
+    public boolean isNoItemInInventory(Item item, Map<Item, Integer> map) 
+            throws NoItemInventoryException;
+    
+    boolean updateInventory(Item item) throws InventoryPersistenceException;
     
 }

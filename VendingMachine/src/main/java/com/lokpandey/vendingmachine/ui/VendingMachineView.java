@@ -7,6 +7,8 @@
 
 package com.lokpandey.vendingmachine.ui;
 
+import com.lokpandey.vendingmachine.dto.Change;
+import com.lokpandey.vendingmachine.dto.Coin;
 import com.lokpandey.vendingmachine.dto.Item;
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,10 +41,6 @@ public class VendingMachineView {
         return io.readInt("Please input your choice:",1, choices);
     }
     
-    public void displayUnknownCommandBanner() {
-        io.print("Unknown Command!!!");
-    }
-    
     public void displayExitBanner() {
         io.print("Good Bye!!!");
     }
@@ -50,5 +48,29 @@ public class VendingMachineView {
     public void displayErrorMessage(String errorMsg) {
         io.print("=== ERROR ===");
         io.print(errorMsg);
+        io.print("TRANSACTION INCOMPLETE");
+        io.readString("Press a key to continue");
+    }
+    
+    public void displayBuyingMessage(Item item) {
+        io.print("You are buying " + item.getName() + " for " + item.getCost());
+    }
+
+    public void displayChange(Change change) {
+        String changeString = "CHANGE is: \n";
+        if(change.getNumberOfQuarters() != 0) 
+            changeString += change.getNumberOfQuarters() + " " + Coin.QUARTER + "\n";
+        if(change.getNumberOfDimes() != 0)
+            changeString += change.getNumberOfDimes() + " " + Coin.DIME + "\n";
+        if(change.getNumberOfNickels() != 0)
+            changeString += change.getNumberOfNickels() + " " + Coin.NICKEL + "\n";
+        if(change.getNumberOfPennies() != 0)
+            changeString += change.getNumberOfPennies() + " " + Coin.PENNY + "\n";
+        io.print(changeString);
+    }
+    
+    public void displaySuccessMessageAndWait() {
+        io.print("TRANSACTION SUCCESSFUL\nThanks for using the Vending Machine");
+        io.readString("Press a key to continue...");
     }
 }

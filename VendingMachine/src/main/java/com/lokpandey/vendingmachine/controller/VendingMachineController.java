@@ -8,15 +8,16 @@
 package com.lokpandey.vendingmachine.controller;
 
 import com.lokpandey.vendingmachine.dao.InventoryPersistenceException;
+import com.lokpandey.vendingmachine.dto.Change;
 import com.lokpandey.vendingmachine.dto.Item;
 import com.lokpandey.vendingmachine.service.InsufficientFundsException;
+import com.lokpandey.vendingmachine.service.NoItemInventoryException;
 import com.lokpandey.vendingmachine.service.VendingMachineServiceLayer;
 import com.lokpandey.vendingmachine.ui.VendingMachineView;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.util.Map;
 
 public class VendingMachineController {
 
@@ -33,7 +34,6 @@ public class VendingMachineController {
                 boolean keepGoing = true;
                 while(keepGoing) {
                     keepGoing = showMenusAndCompute();
-                    exitMessage();
                 }
             
         } catch (InventoryPersistenceException e) {
@@ -43,39 +43,72 @@ public class VendingMachineController {
     }
     
     private boolean showMenusAndCompute() throws InventoryPersistenceException {
-        List<Item> nonZeroInventory = service.serveNonZeroInventory();
-        view.displayMenu(nonZeroInventory);
+        
+        Map<Item, Integer> inventoryMap = service.serveAllInventory();
+        List<Item> inventoryList = new ArrayList<>(inventoryMap.keySet());
+        
+        view.displayMenu(inventoryList);
+        
         //money is inserted in dollars
-        BigDecimal moneyInserted = getMoneyInserted();
-        int totalMenuOptions = nonZeroInventory.size()+1;
+        BigDecimal moneyInserted = new BigDecimal("0");
+        try {
+            moneyInserted = getMoneyInserted();
+        } catch(NumberFormatException nfe) {
+            view.displayErrorMessage(nfe.getMessage());
+            return true;
+        }
+        
+        
+        int totalMenuOptions = inventoryList.size()+1;
         int menuChoice = view.getMenuChoiceSelection(totalMenuOptions);
         if(menuChoice == totalMenuOptions) {
+            exitMessage();
             return false;
         }
         else {
-            Item itemToUpdate = nonZeroInventory.get(menuChoice-1);
             
-            boolean capacity = false;
+            Item itemSelected = inventoryList.get(menuChoice-1);//since menuChoice starts from 1
             try {
-                capacity = service.checkCapacityToBuy(moneyInserted, itemToUpdate.getCost());
+                //check inventory for no item
+                service.isNoItemInInventory(itemSelected, inventoryMap);
+            } catch (NoItemInventoryException ex) {
+                view.displayErrorMessage(ex.getMessage());
+                return true;
+            }
+            
+            try {
+                service.isCapableToBuy(moneyInserted, itemSelected.getCost());
+                
             } catch (InsufficientFundsException ex) {
                 view.displayErrorMessage(ex.getMessage());
+                return true;
             }
-            if(capacity) {
-                //service.updateInventory(Item);
-                //service.returnChange(moneyInserted-item.cost);
-            }
-            
+            buyingMessage(itemSelected);
+            BigDecimal changeToReturn = moneyInserted.subtract(itemSelected.getCost());
+            //convert changeToReturn to pennies
+            changeToReturn = changeToReturn.multiply(BigDecimal.valueOf(100));
+            Change change = new Change(changeToReturn.intValue());
+            view.displayChange(change);
+            service.updateInventory(itemSelected);
+            successMessage();
             return true;
         }
     }
     
-    private BigDecimal getMoneyInserted() {
+    private BigDecimal getMoneyInserted() throws NumberFormatException {
         return view.takeMoney();
     }
     
     private void exitMessage() {
         view.displayExitBanner();
+    }
+    
+    private void buyingMessage(Item item) {
+        view.displayBuyingMessage(item);
+    }
+    
+    private void successMessage() {
+        view.displaySuccessMessageAndWait();
     }
     
     

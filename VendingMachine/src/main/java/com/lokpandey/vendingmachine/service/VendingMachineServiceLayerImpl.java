@@ -12,16 +12,13 @@ import com.lokpandey.vendingmachine.dao.VendingMachineAuditDao;
 import com.lokpandey.vendingmachine.dao.VendingMachineDao;
 import com.lokpandey.vendingmachine.dto.Item;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class VendingMachineServiceLayerImpl implements VendingMachineServiceLayer {
 
-    private VendingMachineDao dao;
-    private VendingMachineAuditDao auditDao;
+    private final VendingMachineDao dao;
+    private final VendingMachineAuditDao auditDao;
 
     public VendingMachineServiceLayerImpl(VendingMachineDao dao, VendingMachineAuditDao auditDao) {
         this.dao = dao;
@@ -29,22 +26,45 @@ public class VendingMachineServiceLayerImpl implements VendingMachineServiceLaye
     }
 
     @Override
-    public Map<Item, Integer> serveInventory() throws InventoryPersistenceException {
-        return dao.selectInventory();
+    public Map<Item, Integer> serveAllInventory() throws InventoryPersistenceException {
+        return dao.selectAllInventory();
     }
 
-    @Override
-    public List<Item> serveNonZeroInventory() throws InventoryPersistenceException {
-        return dao.selectNonZeroInventory();
-    }
+//    @Override
+//    public List<Item> serveNonZeroInventory() throws InventoryPersistenceException {
+//        return dao.selectNonZeroInventory();
+//    }
+//    
     
-    
     @Override
-    public boolean checkCapacityToBuy(BigDecimal money, BigDecimal cost) 
+    public boolean isCapableToBuy(BigDecimal money, BigDecimal cost) 
                                         throws InsufficientFundsException {
         if(money.compareTo(cost) >= 0) return true;
         else throw new InsufficientFundsException("ERROR: $" + money + " is not sufficient");
         
+    }
+    
+    @Override
+    public boolean isNoItemInInventory(Item item, Map<Item, Integer> map)
+                                            throws NoItemInventoryException {
+        boolean isStockZero = false;
+        for(Map.Entry<Item, Integer> entry: map.entrySet()) {
+            Item mapItem = entry.getKey();
+            int quantity = entry.getValue();
+            if(mapItem.getName().equals(item.getName()) && quantity == 0) {
+                isStockZero = true;
+                break;
+            }
+        }
+        if(isStockZero == false) return false;
+        else throw new NoItemInventoryException("ERROR: Sorry! Out of stock");
+    }
+
+    @Override
+    public boolean updateInventory(Item item) throws InventoryPersistenceException {
+        dao.updateInventory(item);
+        auditDao.writeAuditEntry("Item " + item.getName()+ " was Purchased.");
+        return true;
     }
     
 }
